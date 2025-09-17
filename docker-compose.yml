@@ -11,6 +11,8 @@ services:
       - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
       - ./tsconfig.json:/app/tsconfig.json
+      # Mount .npmrc if it exists (for corporate registry)
+      # If it doesn't exist, the Dockerfile.dev will use public registry
       # Exclude node_modules to use the container's modules
       - /app/node_modules
     environment:
@@ -20,7 +22,7 @@ services:
       - SERVER_VERSION=1.0.0
       - LOG_LEVEL=debug
       - CORS_ORIGIN=*
-    command: npm run dev
+    command: npx tsx watch src/index.ts
     # Enable watching for file changes (for hot reloading)
     tty: true
     stdin_open: true

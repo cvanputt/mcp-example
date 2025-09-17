@@ -66,21 +66,32 @@ This server implements the Model Context Protocol, enabling AI assistants and ap
 
 This method provides a consistent development environment with hot reloading:
 
-1. Start the Docker development environment:
+1. Optional: Configure npm registry for development:
+
+   The project is configured to work with both public and private npm registries:
+
+   - **Using public registry (default)**: No action needed.
+   - **Using private/corporate registry**: Create a `.npmrc` file in the project root with your registry configuration:
+     ```
+     registry=https://your-private-registry.com/
+     strict-ssl=true|false
+     ```
+
+2. Start the Docker development environment:
    ```bash
    docker-compose up -d
    ```
 
-2. View logs in real-time:
+3. View logs in real-time:
    ```bash
    docker-compose logs -f
    ```
 
-3. The server will be available at http://localhost:3000
+4. The server will be available at http://localhost:3000
 
-4. Changes to source files will be automatically reflected in the running container thanks to volume mounts and hot reloading
+5. Changes to source files will be automatically reflected in the running container thanks to volume mounts and hot reloading
 
-5. Stop the development container:
+6. Stop the development container:
    ```bash
    docker-compose down
    ```
@@ -193,6 +204,26 @@ curl -X DELETE http://localhost:3000/mcp -H "Mcp-Session-Id: SESSION_ID"
 ├── CLAUDE.md              # Implementation notes and guidance for Claude Code
 └── ...                    # Project configuration files
 ```
+
+## Docker Configuration
+
+The project includes two Docker configurations:
+
+### Development Docker (Dockerfile.dev)
+
+- Based on Node.js 20 Alpine
+- Supports both public and private npm registries
+- Mounts source code for hot reloading
+- Uses tsx for TypeScript execution without compilation
+- Configured to work with or without an `.npmrc` file
+
+### Production Docker (Dockerfile)
+
+- Multi-stage build for optimized image size
+- First stage builds the TypeScript application
+- Second stage contains only the compiled JavaScript and production dependencies
+- Uses public npm registry for AWS AppRunner deployment
+- Optimized for security and performance
 
 ## Deployment to AWS AppRunner
 

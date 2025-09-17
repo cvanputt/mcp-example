@@ -3,15 +3,25 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# Install development dependencies
+# Copy package files
 COPY package*.json ./
+
+# Copy .npmrc if it exists, otherwise configure npm to use public registry
+COPY .npmrc* ./
+RUN if [ ! -f .npmrc ]; then \
+    echo "No .npmrc found, using public registry"; \
+    npm config set registry https://registry.npmjs.org/ && \
+    npm config set strict-ssl true; \
+    fi
+
+# Install dependencies
 RUN npm install
 
-# Install tsx globally for hot reloading
-RUN npm install -g tsx
+# Install tsx as a dev dependency instead of globally
+RUN npm install --save-dev tsx
 
 # Expose port
 EXPOSE 3000
 
 # Command to run development server with hot reloading
-CMD ["npm", "run", "dev"]
+CMD ["npx", "tsx", "watch", "src/index.ts"]
