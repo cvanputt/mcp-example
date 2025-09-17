@@ -1,0 +1,40 @@
+services:
+  mcp-server-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: mcp-server-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+      - ./tsconfig.json:/app/tsconfig.json
+      # Exclude node_modules to use the container's modules
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - SERVER_NAME=mcp-server
+      - SERVER_VERSION=1.0.0
+      - LOG_LEVEL=debug
+      - CORS_ORIGIN=*
+    command: npm run dev
+    # Enable watching for file changes (for hot reloading)
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
+  mcp-inspector:
+    image: ghcr.io/modelcontextprotocol/inspector:latest
+    container_name: mcp-inspector
+    ports:
+      - "6274:6274"
+      - "6277:6277"
+    network_mode: "host"
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+    depends_on:
+      - mcp-server-dev

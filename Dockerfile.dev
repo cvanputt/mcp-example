@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install development dependencies
+COPY package*.json ./
+RUN npm install
+
+# Install tsx globally for hot reloading
+RUN npm install -g tsx
+
+# Expose port
+EXPOSE 3000
+
+# Command to run development server with hot reloading
+CMD ["npm", "run", "dev"]
